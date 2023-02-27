@@ -29,4 +29,10 @@ jobs:
           sh -f "C:/Users/edwin.rosalesjuarez/Documents/shell/deploy.sh" -p releaseservice/target/${{needs.build.outputs.jarFile}} -t /DevOps/devops-rest-apis-main/v-0.0.1 -l "/c/Users/edwin.rosalesjuarez/Documents/shell/servers.txt"
           echo ${{needs.build.outputs.jarFile}}
           
+  call-workflow-passing-data:
+     uses: Ashwini-Lokannavar/devops-rest-apis-postman/blob/main/.github/workflows/postamantest.yml
+     with:
+      config-path: .github/postmantest.yml
+     secrets: inherit
+          
           
