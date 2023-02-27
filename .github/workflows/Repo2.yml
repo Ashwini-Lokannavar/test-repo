@@ -3,18 +3,30 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    runs-on: [self-hosted, FactoryVm]
-    
+    runs-on: [self-hosted, edwin]
+    outputs:
+      jarFile: ${{ steps.publish.outputs.jarFile }}
     steps:
-    - name: Check out repo
-      uses: actions/checkout@v3
-      with:
-        token: ${{ secrets.DEVOPSAPI_POSTMANKEY }}
-        persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token
-        fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
-        
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.DEVOPSAPI_POSTMANKEY }}
-        branch: 'source'    # default using 'master', change it if you want to push to another branch
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: Build on Maven
+        run: mvn -f releaseservice/pom.xml install
+      - name: Set Path file
+        run: |
+          dir /b releaseservice\target\*.jar >> jar.txt
+          set /p jar=<jar.txt
+        shell: cmd
+      - id: publish
+        run: |
+          $filename = (Get-Content jar.txt)
+          echo "jarFile=$filename" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+  upload:
+    needs: build
+    runs-on: [self-hosted, edwin]
+    steps:
+      - name: Upload to SV10 and SV20
+        run: |
+          sh -f "C:/Users/edwin.rosalesjuarez/Documents/shell/deploy.sh" -p releaseservice/target/${{needs.build.outputs.jarFile}} -t /DevOps/devops-rest-apis-main/v-0.0.1 -l "/c/Users/edwin.rosalesjuarez/Documents/shell/servers.txt"
+          echo ${{needs.build.outputs.jarFile}}
+          
+          
