@@ -26,7 +26,6 @@ jobs:
       - name: Test
         run: |
           curl -X POST https://api.github.com/repos/:Ashwini-Lokannavar/:devops-rest-apis-postman/dispatches \
-          -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.DEVOPSAPI_POSTMANKEY }} \
           --data '{"event_type": "Trigger Workflow", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
       - uses: actions/checkout@v3
