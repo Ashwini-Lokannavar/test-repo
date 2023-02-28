@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    runs-on: [self-hosted, edwin]
+    runs-on: [self-hosted, FactoryVm]
     outputs:
       jarFile: ${{ steps.publish.outputs.jarFile }}
     steps:
@@ -22,7 +22,7 @@ jobs:
           echo "jarFile=$filename" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
   upload:
     needs: build
-    runs-on: [self-hosted, edwin]
+    runs-on: [self-hosted, FactoryVm]
     steps:
       - name: Upload to SV10 and SV20
         run: |
