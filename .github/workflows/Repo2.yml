@@ -1,38 +1,32 @@
-name: Auto upload
+name: workflow_01
 on:
   workflow_dispatch:
+     inputs:
+      workflow_02:
+        description: 'ًWorkflow 2 which will be triggered'
+        required: true
+        default: 'workflow_02'
+
+      workflow2_github_account:
+        description: 'GitHub Account Owner'
+        required: true
+        default: ':Ashwini-Lokannavar'
+
+      workflow2_repo_github:
+        description: 'repo-name'
+        required: true
+        default: ':devops-rest-apis-postman' 
+
 jobs:
   build:
     runs-on: [self-hosted, FactoryVm]
-    outputs:
-      jarFile: ${{ steps.publish.outputs.jarFile }}
+
     steps:
-      - name: checkout
-        uses: actions/checkout@v3
-      - name: Build on Maven
-        run: mvn -f releaseservice/pom.xml install
-      - name: Set Path file
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Test
         run: |
-          dir /b releaseservice\target\*.jar >> jar.txt
-          set /p jar=<jar.txt
-        shell: cmd
-      - id: publish
-        run: |
-          $filename = (Get-Content jar.txt)
-          echo "jarFile=$filename" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
-  upload:
-    needs: build
-    runs-on: [self-hosted, FactoryVm]
-    steps:
-      - name: Upload to SV10 and SV20
-        run: |
-          sh -f "C:/Users/edwin.rosalesjuarez/Documents/shell/deploy.sh" -p releaseservice/target/${{needs.build.outputs.jarFile}} -t /DevOps/devops-rest-apis-main/v-0.0.1 -l "/c/Users/edwin.rosalesjuarez/Documents/shell/servers.txt"
-          echo ${{needs.build.outputs.jarFile}}
-          
-  call-workflow-passing-data:
-     uses: Ashwini-Lokannavar/devops-rest-apis-postman/blob/main/.github/workflows/postamantest.yml
-     with:
-      config-path: .github/postmantest.yml
-     secrets: inherit
-          
-          
+          curl -X POST https://api.github.com/repos/:Ashwini-Lokannavar/:devops-rest-apis-postman/dispatches \
+          -H 'Accept: application/vnd.github.everest-preview+json' \
+          -u ${{ secrets.DEVOPSAPI_POSTMANKEY }} \
+          --data '{"event_type": "Trigger Workflow", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
+      - uses: actions/checkout@v3
