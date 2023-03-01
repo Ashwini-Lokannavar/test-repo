@@ -1,31 +1,12 @@
-name: workflow_01
+name: Call a reusable workflow
+
 on:
-  workflow_dispatch:
-     inputs:
-      workflow_02:
-        description: 'ًTest-Build which will be triggered'
-        required: true
-        default: 'Test-Build'
-
-      workflow2_github_account:
-        description: 'GitHub Account Owner'
-        required: true
-        default: ':Ashwini-Lokannavar'
-
-      workflow2_repo_github:
-        description: 'repo-name'
-        required: true
-        default: ':devops-rest-apis-postman' 
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  build:
-    runs-on: [self-hosted, FactoryVm]
+  call-workflow:
+    uses: Travelport-Enterprise/devops-rest-apis-postman/.github/workflows/postamantest.yml@v1
 
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Test
-        run: |
-          curl -X POST https://api.github.com/repos/:Ashwini-Lokannavar/:devops-rest-apis-postman/dispatches \
-          -u ${{ secrets.DEVOPSAPI_POSTMANKEY }} \
-          --data '{"event_type": "Trigger Workflow", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
-      - uses: actions/checkout@v3
+  
