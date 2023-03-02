@@ -7,6 +7,6 @@ on:
 
 jobs:
   call-workflow:
-    uses: Travelport-Enterprise/devops-rest-apis-postman/blob/main/.github/workflows/postamantest.yml@v3
+    uses: Ashwini-Lokannavart/devops-rest-apis-postman/.github/workflows/postamantest.yml@v3
 
   
